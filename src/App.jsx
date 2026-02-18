@@ -1,68 +1,122 @@
 import { useState } from "react";
-
+import "./App.css";
 import Header from "./Components/Header/Header";
 import Footer from "./Components/Footer/Footer";
-import Article from "./Components/Article/Article";
-
-import "./App.css";
+import Modal from "./Components/Modal/Modal";
+import Todo from "./Components/Todo/Todo";
 
 function App() {
-  const [articles, setArticles] = useState([
-    { id: 1, title: "آموزش react", author: "zizi", price: 12_000 },
-    { id: 2, title: "", author: "ensi", price: 0 },
-    { id: 3, title: "", author: "mahi", price: 12_000 },
-    { id: 4, title: "تست defef ", author: "arash", price: 18_000 },
-    { id: 5, title: "بوتسترپ ", author: "zohren", price: 0 },
-    { id: 6, title: "تست داده است  ", author: "mehrdad", price: 10_000 },
-  ]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [todos, setTodos] = useState([]);
 
-  const removeArticle = (articleID) => {
-    const newArticles = articles.filter((article) => article.id !== articleID);
-    setArticles(newArticles);
+  const addTodo = (title, description, isImportant) => {
+    const newTodo = {
+      id: crypto.randomUUID(),
+      title,
+      description,
+      isImportant,
+      isCompleted: false,
+    };
+    setTodos([...todos, newTodo]);
+    setIsModalOpen(false);
   };
-  return (
-    <div>
-      <Header />
-      <main>
-        <section
-          id="hero-section"
-          className="container flex items-center justify-between">
-          <div id="headline">
-            <h1 id="title">سبزبلاگ؛ مرجع آموزش و پروژه‌های برنامه‌نویسی</h1>
-            <p id="caption">
-              سبزبلاگ فضایی برای یادگیری برنامه‌نویسی و به‌اشتراک‌گذاری دانش
-              است. اینجا مقالات آموزشی، نکات کاربردی و پروژه‌های رزومه‌ای
-              برنامه‌نویسی با زبانی ساده و حرفه‌ای ارائه می‌شه. هدف ما کمک به
-              شماست تا مهارت‌هاتون رو تقویت کنید و رزومه‌ای قوی با پروژه‌های
-              جذاب بسازید!
-            </p>
-            <div id="hero-btns" className="gap-2">
-              <button className="btn primary-btn">خواندن مقالات</button>
-              <button className="btn secondary-btn">تهیه اشتراک</button>
-            </div>
-          </div>
-          <div id="image-container">
-            <img src="./public/images/hero-illustrator.png" />
-          </div>
-        </section>
-        <section id="articles-section">
-          <div id="articles-header" className="container flex justify-between">
-            <h2 id="section-title">مقالات اخیر</h2>
-            <a href="#" className="read-more">
-              {" "}
-              بیشتر بخوانید{" "}
-            </a>
-          </div>
 
-          <div id="items" className="container">
-            {articles.map((article) => (
-              <Article {...article} removedata={removeArticle} />
+  const doTodo = (id) => {
+    const updatedTodos = todos.map((todo) => {
+      if (todo.id === id) {
+        todo.isCompleted = true;
+      }
+      return todo;
+    });
+    console.log(todos);
+    
+    setTodos(updatedTodos)
+  };
+
+  const removeTodo = (id) =>{
+    const updatedTodos = todos.filter(todo=>todo.id !== id)
+
+    setTodos(updatedTodos)
+  }
+  return (
+    <>
+      <Header />
+
+      <main className="container pb-25">
+        <div id="headline" className="space-y-3">
+          <h1 className="title">
+            <img src="/images/hourglass.png" className="size-8" />
+            <span> مدیریت و برنامه ریزی </span>
+          </h1>
+          <p className="max-w-[750px] text-zinc-700 text-sm font-Vazir-Medium!">
+            سبز تسک ابزاری قدرتمند برای سازماندهی وظایف روزمره، برنامه‌ریزی
+            پروژه‌ها و افزایش بهره‌وری شماست. با رابط کاربری ساده و امکانات
+            پیشرفته، از پیگیری وظایف تا همکاری تیمی را به آسانی مدیریت کنید.
+          </p>
+        </div>
+
+        <div className="mt-14 border-b w-full border-zinc-200 flex items-center py-3 justify-between">
+          <div></div>
+          <div className="flex items-center gap-2">
+            <div className="dropdown">
+              <input id="dd-toggle" type="checkbox" hidden />
+
+              <label className="dd-btn" htmlFor="dd-toggle">
+                <span>نمایش فقط</span>
+                <i className="fa-solid fa-chevron-down"></i>
+              </label>
+
+              <div className="dropdown_menu" role="menu">
+                <div className="dropdown-label">
+                  <p className="text-start text-xs opacity-60">نمایش فقط</p>
+                </div>
+                <div className="py-1">
+                  <label htmlFor="dd-toggle" className="menu-item">
+                    همه
+                  </label>
+                  <label htmlFor="dd-toggle" className="menu-item">
+                    تکمیل شده ها
+                  </label>
+                  <label htmlFor="dd-toggle" className="menu-item">
+                    در انتظار انجام
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <button id="open-dialog" onClick={() => setIsModalOpen(true)}>
+              <span> ایجاد جدید </span>
+              <div className="btn-divider"></div>
+              <span>
+                <i className="fa-solid fa-plus"></i>
+              </span>
+            </button>
+          </div>
+        </div>
+
+        <section id="tasks" className="space-y-30 mt-5">
+          <div className="space-y-5">
+            <p className="text-sm">تسک های موجود:</p>
+            {todos.map((todo) => (
+              <Todo {...todo} key={todo.id} toDoHandler={doTodo} remove={removeTodo}/>
             ))}
+          </div>
+          <div className="space-y-5">
+            <p className="text-sm">تسک‌های تکمیل‌شده</p>
+
+            {todos
+              .filter((todo) => todo.isCompleted === true)
+              .map((todo) => (
+                <Todo {...todo} />
+              ))}
           </div>
         </section>
       </main>
       <Footer />
-    </div>
+      {isModalOpen && (
+        <Modal onClose={() => setIsModalOpen(false)} addTodoHandler={addTodo} />
+      )}
+    </>
   );
 }
 
