@@ -4,21 +4,27 @@ import Header from "./Components/Header/Header";
 import Footer from "./Components/Footer/Footer";
 import Modal from "./Components/Modal/Modal";
 import Todo from "./Components/Todo/Todo";
+import NoTodo from "./Components/NoTodo/NoTodo";
 
 function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [todos, setTodos] = useState([]);
+  const [filter, setFilter] = useState("all");
 
   const addTodo = (title, description, isImportant) => {
-    const newTodo = {
-      id: crypto.randomUUID(),
-      title,
-      description,
-      isImportant,
-      isCompleted: false,
-    };
-    setTodos([...todos, newTodo]);
-    setIsModalOpen(false);
+    if ((title, description)) {
+      const newTodo = {
+        id: crypto.randomUUID(),
+        title,
+        description,
+        isImportant,
+        isCompleted: false,
+      };
+      setTodos([...todos, newTodo]);
+      setIsModalOpen(false);
+    } else {
+      alert("لطفا عنوان و توضیحات را وارد کنید");
+    }
   };
 
   const doTodo = (id) => {
@@ -28,16 +34,21 @@ function App() {
       }
       return todo;
     });
-    console.log(todos);
-    
-    setTodos(updatedTodos)
+
+    setTodos(updatedTodos);
   };
 
-  const removeTodo = (id) =>{
-    const updatedTodos = todos.filter(todo=>todo.id !== id)
+  const removeTodo = (id) => {
+    const updatedTodos = todos.filter((todo) => todo.id !== id);
 
-    setTodos(updatedTodos)
-  }
+    setTodos(updatedTodos);
+  };
+const filteredTodo = () =>{
+  if(filter === "all") return todos;
+  if(filter === "isCompleted") return todos.filter(todo=>todo.isCompleted)
+  if(filter === "notCompleted") return todos.filter(todo=>!todo.isCompleted )
+}
+ 
   return (
     <>
       <Header />
@@ -62,22 +73,37 @@ function App() {
               <input id="dd-toggle" type="checkbox" hidden />
 
               <label className="dd-btn" htmlFor="dd-toggle">
-                <span>نمایش فقط</span>
+                <span>
+
+                   نمایش{" "}
+                    {filter === "all"
+                      ? "همه"
+                      : filter === "isCompleted"
+                        ? "تکمیل شده ها"
+                        : "در انتظار انجام "}
+                </span>
                 <i className="fa-solid fa-chevron-down"></i>
               </label>
 
               <div className="dropdown_menu" role="menu">
                 <div className="dropdown-label">
-                  <p className="text-start text-xs opacity-60">نمایش فقط</p>
+                  <p className="text-start text-xs opacity-60">
+                    نمایش{" "}
+                    {filter === "all"
+                      ? "همه"
+                      : filter === "isCompleted"
+                        ? "تکمیل شده ها"
+                        : "در انتظار انجام "}
+                  </p>
                 </div>
                 <div className="py-1">
-                  <label htmlFor="dd-toggle" className="menu-item">
+                  <label htmlFor="dd-toggle" className="menu-item" onClick={()=>setFilter("all")}>
                     همه
                   </label>
-                  <label htmlFor="dd-toggle" className="menu-item">
+                  <label htmlFor="dd-toggle" className="menu-item" onClick={()=>setFilter("isCompleted")}>
                     تکمیل شده ها
                   </label>
-                  <label htmlFor="dd-toggle" className="menu-item">
+                  <label htmlFor="dd-toggle" className="menu-item" onClick={()=>setFilter("notCompleted")}>
                     در انتظار انجام
                   </label>
                 </div>
@@ -93,23 +119,42 @@ function App() {
             </button>
           </div>
         </div>
-
         <section id="tasks" className="space-y-30 mt-5">
-          <div className="space-y-5">
-            <p className="text-sm">تسک های موجود:</p>
-            {todos.map((todo) => (
-              <Todo {...todo} key={todo.id} toDoHandler={doTodo} remove={removeTodo}/>
-            ))}
-          </div>
-          <div className="space-y-5">
-            <p className="text-sm">تسک‌های تکمیل‌شده</p>
+          {filteredTodo().length !== 0 ? (
+            <>
+              <div className="space-y-5">
+                <p className="text-sm">تسک های موجود:</p>
+                {filteredTodo().map((todo) => (
+                  <Todo
+                    {...todo}
+                    key={todo.id}
+                    toDoHandler={doTodo}
+                    remove={removeTodo}
+                  />
+                ))}
+              </div>
+              <div className="space-y-5">
+                <p className="text-sm">تسک‌های تکمیل‌شده</p>
 
-            {todos
-              .filter((todo) => todo.isCompleted === true)
-              .map((todo) => (
-                <Todo {...todo} />
-              ))}
-          </div>
+                {todos.filter((todo) => todo.isCompleted === true).length ? (
+                  todos
+                    .filter((todo) => todo.isCompleted === true)
+                    .map((todo) => (
+                      <Todo
+                        {...todo}
+                        key={todo.id}
+                        toDoHandler={doTodo}
+                        remove={removeTodo}
+                      />
+                    ))
+                ) : (
+                  <NoTodo />
+                )}
+              </div>
+            </>
+          ) : (
+            <NoTodo />
+          )}
         </section>
       </main>
       <Footer />

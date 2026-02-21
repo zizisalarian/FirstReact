@@ -1,13 +1,21 @@
 import "./Todo.css";
 
-function Task({id, title, desc, isCompleted, isImportant , toDoHandler , remove}) {
+function Task({
+  id,
+  title,
+  description,
+  isCompleted,
+  isImportant,
+  toDoHandler,
+  remove,
+}) {
   return (
-    <div className="space-y-0.5" >
+    <div className="space-y-0.5">
       <article className="task-card">
         <div className="task-content">
           <div>
             <h3>{title}</h3>
-            <p className="task-desc">{desc}</p>
+            <p className="task-desc">{description}</p>
           </div>
         </div>
 
@@ -20,10 +28,10 @@ function Task({id, title, desc, isCompleted, isImportant , toDoHandler , remove}
           </div>
           {!isCompleted && (
             <div className="moderate-btns">
-              <button className="complete-task" onClick={()=>toDoHandler(id)}>
+              <button className="complete-task" onClick={() => toDoHandler(id)}>
                 <i className="fa-solid fa-circle-check"></i>
               </button>
-              <button className="undone-btn" onClick={()=>remove(id)}>
+              <button className="undone-btn" onClick={() => remove(id)}>
                 <i className="fa-solid fa-xmark"></i>
               </button>
             </div>
